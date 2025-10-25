@@ -1,5 +1,6 @@
 # Mautic 6 Production Docker Image
-FROM php:8.4-apache
+# Using PHP 8.3 for better package compatibility and stability
+FROM php:8.3-apache
 
 LABEL maintainer="Mautic Community"
 LABEL description="Mautic 6 - Open Source Marketing Automation"

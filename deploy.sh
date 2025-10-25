@@ -41,21 +41,46 @@ echo ""
 if [ ! -f .env ]; then
     echo "Step 4: Creating .env file..."
     cp .env.docker.example .env
+
+    # Generate random passwords
+    MYSQL_ROOT_PASS=$(openssl rand -base64 32 | tr -d "=+/" | cut -c1-25)
+    MAUTIC_DB_PASS=$(openssl rand -base64 32 | tr -d "=+/" | cut -c1-25)
+
+    # Update .env file with generated passwords and correct settings
+    sed -i "s/changeme_root_password/${MYSQL_ROOT_PASS}/" .env
+    sed -i "s/changeme_db_password/${MAUTIC_DB_PASS}/" .env
+    sed -i "s|MAUTIC_URL=http://localhost:8080|MAUTIC_URL=https://mautic6.dubby.online|" .env
+    sed -i "s|MAUTIC_TRUSTED_PROXIES=0.0.0.0/0|MAUTIC_TRUSTED_PROXIES=127.0.0.1,136.144.169.138|" .env
+
     echo ""
-    echo "⚠️  IMPORTANT: You need to edit .env with your passwords!"
+    echo "✅ .env file created with auto-generated passwords!"
     echo ""
-    echo "Run this command to edit:"
-    echo "  nano /home/componental/mautic6/.env"
+    echo "Passwords have been saved to: /home/componental/mautic6/.env"
+    echo "MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASS}"
+    echo "MAUTIC_DB_PASSWORD: ${MAUTIC_DB_PASS}"
     echo ""
-    echo "Update these values:"
-    echo "  - MYSQL_ROOT_PASSWORD (use a strong password)"
-    echo "  - MAUTIC_DB_PASSWORD (use a strong password)"
-    echo "  - MAUTIC_URL=https://mautic6.dubby.online"
-    echo "  - MAUTIC_TRUSTED_PROXIES=127.0.0.1,136.144.169.138"
+    echo "⚠️  IMPORTANT: Save these passwords somewhere safe!"
     echo ""
-    read -p "Press Enter when you've edited the .env file..."
+    read -p "Press Enter to continue..."
 else
-    echo "Step 4: .env file already exists, skipping..."
+    echo "Step 4: .env file already exists, checking configuration..."
+    if grep -q "changeme_root_password" .env || grep -q "changeme_db_password" .env; then
+        echo ""
+        echo "⚠️  WARNING: .env file still has default passwords!"
+        echo ""
+        echo "Please edit .env and set strong passwords:"
+        echo "  nano /home/componental/mautic6/.env"
+        echo ""
+        echo "Update these values:"
+        echo "  - MYSQL_ROOT_PASSWORD"
+        echo "  - MAUTIC_DB_PASSWORD"
+        echo "  - MAUTIC_URL=https://mautic6.dubby.online"
+        echo "  - MAUTIC_TRUSTED_PROXIES=127.0.0.1,136.144.169.138"
+        echo ""
+        read -p "Press Enter when you've edited the .env file..."
+    else
+        echo "✅ .env file is configured"
+    fi
 fi
 
 # Step 5: Build and start Docker containers
