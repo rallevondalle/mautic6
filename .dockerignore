@@ -1,0 +1,73 @@
+# Git files
+.git
+.gitignore
+.gitattributes
+.github
+
+# DDEV development files
+.ddev
+
+# Gitpod files
+.gitpod.yml
+.gitpod.Dockerfile
+
+# Development files
+*.md
+README.md
+CHANGELOG.md
+CONTRIBUTING.md
+LICENSE.txt
+UPGRADE.md
+
+# Docker files (to avoid recursion)
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# IDE files
+.idea
+.vscode
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Testing files
+tests
+codeception.yml
+phpunit.xml.dist
+phpstan.neon.dist
+.php-cs-fixer.dist.php
+
+# CI/CD files
+.travis.yml
+.gitlab-ci.yml
+azure-pipelines.yml
+
+# Node modules (if any)
+node_modules
+npm-debug.log
+yarn-error.log
+
+# Composer development files
+phpunit.xml
+phpcs.xml
+
+# Cache and logs (will be created fresh)
+var/cache/*
+var/logs/*
+var/spool/*
+
+# Documentation
+docs
+
+# Vagrant
+Vagrantfile
+.vagrant
+
+# Scripts
+*.sh
+bin/configure

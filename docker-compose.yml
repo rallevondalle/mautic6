@@ -1,0 +1,79 @@
+version: '3.8'
+
+services:
+  mautic:
+    build: .
+    image: mautic:6
+    container_name: mautic6
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    volumes:
+      - mautic_data:/var/www/html/var
+      - mautic_media:/var/www/html/media
+      - mautic_config:/var/www/html/config
+    environment:
+      - MAUTIC_DB_HOST=db
+      - MAUTIC_DB_PORT=3306
+      - MAUTIC_DB_NAME=${MAUTIC_DB_NAME:-mautic}
+      - MAUTIC_DB_USER=${MAUTIC_DB_USER:-mautic}
+      - MAUTIC_DB_PASSWORD=${MAUTIC_DB_PASSWORD}
+      - MAUTIC_TRUSTED_PROXIES=${MAUTIC_TRUSTED_PROXIES:-0.0.0.0/0}
+      - MAUTIC_URL=${MAUTIC_URL:-http://localhost:8080}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - mautic-network
+
+  db:
+    image: mariadb:10.11
+    container_name: mautic6_db
+    restart: unless-stopped
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${MAUTIC_DB_NAME:-mautic}
+      - MYSQL_USER=${MAUTIC_DB_USER:-mautic}
+      - MYSQL_PASSWORD=${MAUTIC_DB_PASSWORD}
+    volumes:
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - mautic-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: mautic6_redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    networks:
+      - mautic-network
+
+volumes:
+  mautic_data:
+    driver: local
+  mautic_media:
+    driver: local
+  mautic_config:
+    driver: local
+  db_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  mautic-network:
+    driver: bridge
