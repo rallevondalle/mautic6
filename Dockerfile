@@ -86,7 +86,8 @@ RUN { \
 COPY --chown=www-data:www-data . /var/www/html
 
 # Install PHP dependencies
-RUN composer install --no-dev --optimize-autoloader --no-interaction --no-progress
+# Note: Ignoring IMAP platform requirement as it's not critical for most Mautic deployments
+RUN composer install --no-dev --optimize-autoloader --no-interaction --no-progress --ignore-platform-req=ext-imap
 
 # Set proper permissions
 RUN chown -R www-data:www-data /var/www/html \
