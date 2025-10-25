@@ -85,9 +85,30 @@ fi
 
 # Step 5: Build and start Docker containers
 echo ""
-echo "Step 5: Building and starting Docker containers..."
-echo "This may take several minutes on first run..."
-docker compose build
+echo "Step 5: Finding available port and starting Docker containers..."
+
+# Find an available port between 8080-8099
+MAUTIC_PORT=""
+for port in {8080..8099}; do
+    if ! sudo lsof -i :$port > /dev/null 2>&1; then
+        MAUTIC_PORT=$port
+        echo "Found available port: $MAUTIC_PORT"
+        break
+    fi
+done
+
+if [ -z "$MAUTIC_PORT" ]; then
+    echo "ERROR: No available ports found between 8080-8099"
+    echo "Please free up a port or modify docker-compose.yml manually"
+    exit 1
+fi
+
+# Update docker-compose.yml with the available port
+sed -i "s/\"[0-9]*:80\"/\"${MAUTIC_PORT}:80\"/" docker-compose.yml
+echo "Updated docker-compose.yml to use port ${MAUTIC_PORT}"
+
+echo "Building and starting containers (first build takes 3-5 minutes)..."
+docker compose build --no-cache
 docker compose up -d
 
 # Step 6: Wait for services to be healthy
@@ -106,8 +127,10 @@ echo ""
 echo "Next Steps:"
 echo ""
 echo "1. Setup Nginx Reverse Proxy:"
+echo "   # Update nginx config to use port ${MAUTIC_PORT}"
+echo "   sudo sed -i 's/proxy_pass http:\/\/127.0.0.1:[0-9]*/proxy_pass http:\/\/127.0.0.1:${MAUTIC_PORT}/' /home/componental/mautic6/nginx-mautic6.conf"
 echo "   sudo cp /home/componental/mautic6/nginx-mautic6.conf /etc/nginx/sites-available/mautic6.dubby.online"
-echo "   sudo ln -s /etc/nginx/sites-available/mautic6.dubby.online /etc/nginx/sites-enabled/"
+echo "   sudo ln -sf /etc/nginx/sites-available/mautic6.dubby.online /etc/nginx/sites-enabled/"
 echo "   sudo nginx -t"
 echo "   sudo systemctl reload nginx"
 echo ""
