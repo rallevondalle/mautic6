@@ -25,11 +25,20 @@ sudo sh get-docker.sh
 ## Step 1: Clone Mautic 6 Repository
 
 ```bash
-# Clone to your server
-cd /opt
+# Navigate to your Docker projects directory
+cd /home/componental
+
+# Clone the repository
 git clone https://github.com/rallevondalle/mautic6.git
+
+# Enter the directory
 cd mautic6
+
+# Checkout the Docker-enabled branch
 git checkout claude/mautic-6-docker-image-011CUUS6hn3Y9SVGjAauUtE8
+
+# Verify you're on the correct branch
+git branch
 ```
 
 ## Step 2: Configure Environment Variables
@@ -86,7 +95,7 @@ mautic6_redis       redis:7-alpine      Up (healthy)
 
 ```bash
 # Copy the nginx configuration
-cp /opt/mautic6/nginx-mautic6.conf /etc/nginx/sites-available/mautic6.dubby.online
+cp /home/componental/mautic6/nginx-mautic6.conf /etc/nginx/sites-available/mautic6.dubby.online
 
 # Create symlink to enable the site
 ln -s /etc/nginx/sites-available/mautic6.dubby.online /etc/nginx/sites-enabled/
@@ -255,19 +264,19 @@ docker system df
 ### Backup Database
 ```bash
 # Create backup directory
-mkdir -p /opt/mautic-backups
+mkdir -p /home/componental/mautic-backups
 
 # Backup database
-docker compose exec db mysqldump -u mautic -p mautic > /opt/mautic-backups/mautic_$(date +%Y%m%d_%H%M%S).sql
+docker compose exec db mysqldump -u mautic -p mautic > /home/componental/mautic-backups/mautic_$(date +%Y%m%d_%H%M%S).sql
 
 # Backup media files
 docker compose exec mautic tar czf /tmp/media_backup.tar.gz /var/www/html/media
-docker compose cp mautic:/tmp/media_backup.tar.gz /opt/mautic-backups/media_$(date +%Y%m%d_%H%M%S).tar.gz
+docker compose cp mautic:/tmp/media_backup.tar.gz /home/componental/mautic-backups/media_$(date +%Y%m%d_%H%M%S).tar.gz
 ```
 
 ### Update Mautic
 ```bash
-cd /opt/mautic6
+cd /home/componental/mautic6
 git pull origin claude/mautic-6-docker-image-011CUUS6hn3Y9SVGjAauUtE8
 docker compose build
 docker compose up -d
