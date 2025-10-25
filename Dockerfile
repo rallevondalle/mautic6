@@ -17,12 +17,10 @@ RUN apt-get update && apt-get install -y \
     libxml2-dev \
     libzip-dev \
     libicu-dev \
-    libc-client-dev \
     libkrb5-dev \
     unzip \
     cron \
     default-mysql-client \
-    && docker-php-ext-configure imap --with-kerberos --with-imap-ssl \
     && docker-php-ext-install -j$(nproc) \
     pdo_mysql \
     mysqli \
@@ -33,10 +31,13 @@ RUN apt-get update && apt-get install -y \
     gd \
     zip \
     intl \
-    imap \
     opcache \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
+
+# Note: IMAP extension removed for compatibility
+# Most Mautic installations use SMTP and don't require IMAP
+# If you need IMAP support, you can configure it via Mautic's email settings
 
 # Install Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
