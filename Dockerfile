@@ -91,7 +91,14 @@ COPY --chown=www-data:www-data . /var/www/html
 RUN composer install --no-dev --optimize-autoloader --no-interaction --no-progress --ignore-platform-req=ext-imap --no-scripts
 
 # Set proper permissions
-RUN chown -R www-data:www-data /var/www/html \
+# Create required directories first if they don't exist
+RUN mkdir -p /var/www/html/var/cache \
+    /var/www/html/var/logs \
+    /var/www/html/var/spool \
+    /var/www/html/media/files \
+    /var/www/html/media/images \
+    /var/www/html/translations \
+    && chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html \
     && chmod -R 775 /var/www/html/var/cache \
     && chmod -R 775 /var/www/html/var/logs \
