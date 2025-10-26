@@ -80,6 +80,7 @@ RUN { \
     echo 'max_execution_time=300'; \
     echo 'date.timezone=UTC'; \
     echo 'always_populate_raw_post_data=-1'; \
+    echo 'session.save_path=/var/www/html/var/sessions'; \
     } > /usr/local/etc/php/conf.d/mautic.ini
 
 # Copy application files
@@ -95,6 +96,7 @@ RUN composer install --no-dev --optimize-autoloader --no-interaction --no-progre
 RUN mkdir -p /var/www/html/var/cache \
     /var/www/html/var/logs \
     /var/www/html/var/spool \
+    /var/www/html/var/sessions \
     /var/www/html/media/files \
     /var/www/html/media/images \
     /var/www/html/translations \
@@ -103,6 +105,7 @@ RUN mkdir -p /var/www/html/var/cache \
     && chmod -R 775 /var/www/html/var/cache \
     && chmod -R 775 /var/www/html/var/logs \
     && chmod -R 775 /var/www/html/var/spool \
+    && chmod -R 775 /var/www/html/var/sessions \
     && chmod -R 775 /var/www/html/media/files \
     && chmod -R 775 /var/www/html/media/images \
     && chmod -R 775 /var/www/html/translations
@@ -178,6 +181,7 @@ mkdir -p /var/www/html/var/cache \
     /var/www/html/var/logs \
     /var/www/html/var/spool \
     /var/www/html/var/tmp \
+    /var/www/html/var/sessions \
     /var/www/html/media/files \
     /var/www/html/media/images \
     /var/www/html/translations
@@ -197,6 +201,7 @@ chmod -R 775 /var/www/html/var/cache \
     /var/www/html/var/logs \
     /var/www/html/var/spool \
     /var/www/html/var/tmp \
+    /var/www/html/var/sessions \
     /var/www/html/media/files \
     /var/www/html/media/images \
     /var/www/html/translations
