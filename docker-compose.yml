@@ -18,7 +18,7 @@ services:
       - MAUTIC_DB_NAME=${MAUTIC_DB_NAME:-mautic}
       - MAUTIC_DB_USER=${MAUTIC_DB_USER:-mautic}
       - MAUTIC_DB_PASSWORD=${MAUTIC_DB_PASSWORD}
-      - MAUTIC_TRUSTED_PROXIES=${MAUTIC_TRUSTED_PROXIES:-0.0.0.0/0}
+      - MAUTIC_TRUSTED_PROXIES=${MAUTIC_TRUSTED_PROXIES:-["0.0.0.0/0"]}
       - MAUTIC_URL=${MAUTIC_URL:-http://localhost:8080}
     depends_on:
       db:
