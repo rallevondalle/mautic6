@@ -172,6 +172,42 @@ COPY <<'EOF' /entrypoint.sh
 #!/bin/bash
 set -e
 
+# Ensure required directories exist with proper permissions
+# This is critical when volumes are mounted, as they may override the Dockerfile setup
+mkdir -p /var/www/html/var/cache \
+    /var/www/html/var/logs \
+    /var/www/html/var/spool \
+    /var/www/html/var/tmp \
+    /var/www/html/media/files \
+    /var/www/html/media/images \
+    /var/www/html/translations
+
+# If config directory is empty (first run), copy default config files
+if [ ! -f /var/www/html/config/local.php ] && [ -f /var/www/html/app/config/config.php ]; then
+    echo "First run detected - config directory will be populated by installer"
+fi
+
+# Set ownership and permissions
+chown -R www-data:www-data /var/www/html/var \
+    /var/www/html/media \
+    /var/www/html/config \
+    /var/www/html/translations
+
+chmod -R 775 /var/www/html/var/cache \
+    /var/www/html/var/logs \
+    /var/www/html/var/spool \
+    /var/www/html/var/tmp \
+    /var/www/html/media/files \
+    /var/www/html/media/images \
+    /var/www/html/translations
+
+chmod -R 775 /var/www/html/config
+
+# Clear cache if APP_ENV is dev
+if [ "${APP_ENV}" = "dev" ]; then
+    rm -rf /var/www/html/var/cache/*
+fi
+
 # Start cron service
 service cron start
 

@@ -11,6 +11,8 @@ services:
       - mautic_media:/var/www/html/media
       - mautic_config:/var/www/html/config
     environment:
+      - APP_ENV=prod
+      - APP_DEBUG=0
       - MAUTIC_DB_HOST=db
       - MAUTIC_DB_PORT=3306
       - MAUTIC_DB_NAME=${MAUTIC_DB_NAME:-mautic}
