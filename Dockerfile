@@ -208,8 +208,17 @@ if [ "${APP_ENV}" = "dev" ]; then
     rm -rf /var/www/html/var/cache/*
 fi
 
-# Start cron service
-service cron start
+# Only start cron if Mautic has been installed
+# This prevents cron jobs from running during the initial installation
+# which would cause database connection errors
+if [ -f /var/www/html/config/local.php ]; then
+    echo "Mautic is installed - starting cron service"
+    service cron start
+else
+    echo "Mautic not yet installed - cron will be disabled until installation is complete"
+    echo "After installation, restart the container to enable cron jobs:"
+    echo "  docker compose restart mautic"
+fi
 
 # Execute the original command
 exec apache2-foreground
